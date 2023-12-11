@@ -1,0 +1,8 @@
+{
+    "project_name": "test",
+    "node_name": "GF_generator MCP",
+    "data_layer_name": "layer1",
+    "package_ids": [
+        1845780
+    ]
+}

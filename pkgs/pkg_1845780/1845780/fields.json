@@ -1,0 +1,14 @@
+{
+  "dx": null,
+  "fd": 500,
+  "random": null,
+  "sensor_array_limits": null,
+  "sensor_array_numbers": null,
+  "sensor_array_spacing": null,
+  "source_form": "sphere",
+  "source_loc": null,
+  "source_size": null,
+  "T": 2,
+  "vp": 1000,
+  "vs": 3000
+}
