@@ -1,8 +1,8 @@
 {
-    "project_name": "test",
-    "node_name": "GF_generator MCP",
-    "data_layer_name": "layer1",
+    "project_name": "ftp_loader",
+    "node_name": "list_files",
+    "data_layer_name": "Initial",
     "package_ids": [
-        1845780
+        1856176
     ]
 }

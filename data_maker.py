@@ -31,12 +31,12 @@ class DataMaker:
         self.connect_server()
         self.get_connect_data() #
         self.get_project()
-        # self.get_node()
-        # self.get_data_layer()
-        # self.get_package()
+        self.get_node()
+        self.get_data_layer()
+        self.get_package()
         self.set_packages_save_path() #
-        # self.download_packages()
-        # self.extract_packages()
+        self.download_packages()
+        self.extract_packages()
         self.load_packages_data() #
         # self.list_params()
         #self.initiate_interface()
@@ -161,7 +161,7 @@ class DataMaker:
 
     def get_package(self):
         self.package = Package(server=self.server, project_id=self.project.id, node_id=self.node.id)
-        self.package.search(data_layer_id=data_layer_id)
+        self.package.search(data_layer_id=self.data_layer.id)
 
     def extract_data(self, package_ids):
         for package_id in package_ids:
@@ -186,6 +186,7 @@ class DataMaker:
     def select_project(self, project_name):
         projects = self.project.list_projects()
         for project in projects["items"]:
+            print(project["label"])
             if project["label"] == project_name:
                 project_id = project["id"]
                 break
@@ -228,5 +229,7 @@ class DataMaker:
         return tokens["access_token"]
 
 
-DataMaker()
+obj=DataMaker()
+print(obj.packages_data)
+pass
 
