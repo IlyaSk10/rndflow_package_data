@@ -4,21 +4,13 @@ import os
 import numpy as np
 import h5py
 
-from user import User
 from server import Server, response_json
-from workspace import Workspace
 from project import Project
 from node import Node
-#from s3_server import S3_server
-from apikey import Apikey
 from package import Package
 from data_layer import DataLayer
 from additional import get_from_json, extract_tarfile
 from parameters import Parameters
-# from sensors_list_model import SensorsListModel
-# from parameters_table_model import ParametersTableModel
-# from plot_parameters_table_model import PlotParametersTableModel
-#from canvas import Canvas
 
 JSON_PATH = "json_files/"
 SITE_PATH = "https://ias.rndflow.com"
@@ -27,50 +19,16 @@ PACKAGES_SAVE_PATH = "packages"
 
 class DataMaker:
     def __init__(self):
-        #self.ui = ui
         self.connect_server()
-        self.get_connect_data() #
+        self.get_connect_data()
         self.get_project()
         self.get_node()
         self.get_data_layer()
         self.get_package()
-        self.set_packages_save_path() #
+        self.set_packages_save_path()
         self.download_packages()
         self.extract_packages()
-        self.load_packages_data() #
-        # self.list_params()
-        #self.initiate_interface()
-        #self.fill_interface()
-        #self.ui.buildPushButton.clicked.connect(self.fill_interface)
-
-    # def initiate_interface(self):
-    #     self.sensors_list_model = SensorsListModel()
-    #     #.sensorsListView.setModel(self.sensors_list_model)
-    #     #self.ui.interferometryGroupBox.setVisible(False)
-    #     #self.ui.snlGroupBox.setVisible(False)
-    #     self.parameters_table_model = ParametersTableModel()
-    #     self.plot_parameters_table_model = PlotParametersTableModel()
-    #     #self.ui.parametersTableView.setModel(self.parameters_table_model)
-    #     #self.ui.plotParametersTableView.setModel(self.plot_parameters_table_model)
-    #     self.fig_ids = ['0', '1', '2', '2w', '6', '7a', '8', '7b', '9', '10', '11', '12', '13', '14', '15']
-    #     #self.ui.characteristicsComboBox.clear()
-    #     #self.ui.characteristicsComboBox.addItems([f'fig{x}' for x in self.fig_ids])
-
-    # def fill_interface(self):
-    #     self.segy_files_list = ['1429003', '1429002', '1429001']
-    #     self.sensors_list_model.sensors = list(range(1, 100))
-    #     # self.parameters_table_model.parameters = dict((x['node_param_schema']['name'], x['value']) for x in self.parameters.all_param_values)
-    #     self.parameters_table_model.parameters = {'par1': 1, 'par2': False, 'par3': 100, 'par4': -100, 'par5': True}        # self.parameters_table_model.parameters = {'transformed': 1, 'fmin': 0, 'fmax': 5}
-    #     self.plot_parameters_table_model.parameters = {'pparam1': 1, 'pparam2': 2, 'pparam3': 3, 'pparam4': 4}
-    #     #self.canvas = Canvas(
-    #     #    widget=self.ui.graphicsWidget, ui=self.ui, fig_id='0',
-    #     #    fig_func_params=dict(sz=self.packages_data[1429003]['SZ']))
-    #     # diff_sz = np.diff(self.packages_data[1429003]['SZ'], n=1, axis=0)
-    #     # self.canvas = Canvas(widget=self.ui.graphicsWidget, ui=self.ui, fig_id='1', params=dict(diff_sz=diff_sz))
-    #     #self.ui.segySelectComboBox.clear()
-    #     #self.ui.segySelectComboBox.addItems(self.segy_files_list)
-    #     self.parameters_table_model.layoutChanged.emit()
-    #     self.plot_parameters_table_model.layoutChanged.emit()
+        self.load_packages_data()
 
     def list_params(self):
         self.parameters = Parameters(server=self.server, project_id=self.project.id)
@@ -178,7 +136,7 @@ class DataMaker:
     def select_project_from_workspace(self, project_name):
         projects = self.workspace.list_projects()
         for project in projects["items"]:
-           if project["label"] == project_name:
+            if project["label"] == project_name:
                 project_id = project["id"]
                 break
         self.project.read(project_id=project_id)
@@ -225,11 +183,10 @@ class DataMaker:
             "Content-Type": "application/json",
             "Authorization": "Bearer <JWT>",
         }
-        tokens =  response_json(requests.post)(url=f"{url}/api/auth/tokens", data=json.dumps(data), headers=headers)
+        tokens = response_json(requests.post)(url=f"{url}/api/auth/tokens", data=json.dumps(data), headers=headers)
         return tokens["access_token"]
 
 
-obj=DataMaker()
+obj = DataMaker()
 print(obj.packages_data)
 pass
-
