@@ -3,7 +3,7 @@ import os
 
 class Package(object):
     def __init__(self, server, project_id=None, node_id=None, data_layer_id=None):
-        self.site  = server
+        self.site = server
         self.project_id = project_id
         self.id = None
         self.node_id = node_id
@@ -15,7 +15,7 @@ class Package(object):
         self.data_layer_id = data_layer_id or self.data_layer_id
         if self.data_layer_id is None:
             return None
-        print(f"Searching packages in #{self.node_id} node of #{self.project_id} project ...", end="")
+        print(f"Searching packages in #{self.node_id} node of #{self.project_id} project ...\n", end="")
         data = data or {
             "master_id": master_id or 0,
             "sort_by": "id",
@@ -29,7 +29,8 @@ class Package(object):
         params = {
             "data_layer_id": self.data_layer_id,
         }
-        self.all = self.site.post(endpoint=f"/projects/{self.project_id}/nodes/{self.node_id}/packages/search", data=data, params=params)
+        self.all = self.site.post(endpoint=f"/projects/{self.project_id}/nodes/{self.node_id}/packages/search",
+                                  data=data, params=params)
         return self.all
 
     def read(self, node_id, package_id):
@@ -57,12 +58,14 @@ class Package(object):
             return
         for package_id in package_ids:
             file_path = os.path.join(save_path, f"{str(package_id)}.tar")
-            print(f"Downloading #{package_id} package #{self.node_id} node of #{self.project_id} project to: {file_path}...", end="")
+            print(
+                f"Downloading #{package_id} package #{self.node_id} node of #{self.project_id} project to: {file_path}... \n",
+                end="")
             data = {
-                "packages": [package_id,],
+                "packages": [package_id, ],
             }
-            response = self.site.post(endpoint=f"/projects/{self.project_id}/nodes/{self.node_id}/packages/download", data=data, params=params)
+            response = self.site.post(endpoint=f"/projects/{self.project_id}/nodes/{self.node_id}/packages/download",
+                                      data=data, params=params)
             with open(file_path, 'wb') as f:
                 f.write(response)
-            print(f"File downloaded and saved to: {file_path}")
-
+            print(f"File downloaded and saved to: {file_path} \n")

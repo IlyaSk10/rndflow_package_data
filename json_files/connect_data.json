@@ -1,8 +1,8 @@
 {
-    "project_name": "ftp_loader",
-    "node_name": "list_files",
-    "data_layer_name": "Initial",
+    "project_name": "9_Numerical_simulation_graph",
+    "node_name": "Converter_upd",
+    "data_layer_name": "TEST",
     "package_ids": [
-        1856176
+        2214399
     ]
 }

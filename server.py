@@ -11,7 +11,6 @@ import pathlib
 import urllib3
 import ssl
 
-
 urllib3.disable_warnings()
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -32,8 +31,9 @@ def response_json(function):
         try:
             return response.json()
         except json.JSONDecodeError:
-            print("non-JSON response.")
+            print("non-JSON response. \n")
             return response.content
+
     return wrapper
 
 
@@ -83,7 +83,7 @@ class Server:
             status=config.common_conn_retry_status,
             other=config.common_conn_retry_other,
             backoff_factor=config.common_conn_retry_backoff_factor,
-            status_forcelist=(502,504)))
+            status_forcelist=(502, 504)))
 
         adapter_spec = TimeoutHTTPAdapter(timeout=config.spec_conn_timeout, max_retries=Retry(
             total=config.spec_conn_retry_total,
@@ -93,7 +93,7 @@ class Server:
             status=config.spec_conn_retry_status,
             other=config.spec_conn_retry_other,
             backoff_factor=config.spec_conn_retry_backoff_factor,
-            status_forcelist=(502,504)))
+            status_forcelist=(502, 504)))
 
         self.session = requests.Session()
         self.raw_session = requests.Session()
@@ -131,10 +131,9 @@ class Server:
     def refresh_header(self):
         return dict(Authorization=f"Bearer {self.refresh_token}")
 
-
     def refresh_tokens(self):
         response = self.raw_session.post(self.refresh_url,
-                headers=self.refresh_header)
+                                         headers=self.refresh_header)
         if response.status_code != requests.codes.ok:
             print(self.refresh_url, response.text)
         response.raise_for_status()
@@ -216,12 +215,12 @@ class Server:
             os.chmod(path, 0o770)
 
     def upload_project_file(self, project, path, name=None):
-        path     = pathlib.Path(path)
-        name     = name or path.name
-        size     = path.stat().st_size
-        f_hash   = file_hash(path)
-        binary   = is_binary(str(path))
-        f_type,_ = mimetypes.guess_type(str(path))
+        path = pathlib.Path(path)
+        name = name or path.name
+        size = path.stat().st_size
+        f_hash = file_hash(path)
+        binary = is_binary(str(path))
+        f_type, _ = mimetypes.guess_type(str(path))
         if f_type is None:
             f_type = 'application/x-binary' if binary else 'text/plain'
 
@@ -231,23 +230,24 @@ class Server:
                 self.raw_session.put(link, data=f, headers={
                     'Content-Type': f_type,
                     'Content-Length': str(size)
-                    }).raise_for_status()
+                }).raise_for_status()
 
         return dict(
-            name          = name,
-            content_hash  = f_hash,
-            type          = f_type,
-            is_executable = os.access(path, os.X_OK),
-            is_binary     = binary,
-            size          = size
-            )
+            name=name,
+            content_hash=f_hash,
+            type=f_type,
+            is_executable=os.access(path, os.X_OK),
+            is_binary=binary,
+            size=size
+        )
 
 
-class ServerProxy (Server):
+class ServerProxy(Server):
     """
     Wrapper for Server class
     """
-    def __init__(self, api_key:str, project:int, input_node:int, output_node:int, api_server:str=None):
+
+    def __init__(self, api_key: str, project: int, input_node: int, output_node: int, api_server: str = None):
         """
         Args:
             api_key (str): API key
@@ -262,7 +262,7 @@ class ServerProxy (Server):
 
         super().__init__(api_key=api_key, api_server=api_server)
 
-    def getServer(prefix:str, api_server:str=None):
+    def getServer(prefix: str, api_server: str = None):
         """
         Get ServerProxy object.
 
@@ -279,14 +279,14 @@ class ServerProxy (Server):
         except:
             pass
 
-        api_key= secret(f'{prefix}_token')
-        project =  secret(f'{prefix}_project')
+        api_key = secret(f'{prefix}_token')
+        project = secret(f'{prefix}_project')
         input_node = secret(f'{prefix}_input')
         output_node = secret(f'{prefix}_output')
 
         return ServerProxy(api_key, project, input_node, output_node, api_server)
 
-    def getLastDataLayer(self)->int:
+    def getLastDataLayer(self) -> int:
         """
         Get the ID of the last data layer available to the user.
         Returns:
@@ -295,7 +295,7 @@ class ServerProxy (Server):
         layer = self.get(f'/projects/{self.project}/data_layers/last')
         return layer['id']
 
-    def getDataLayers(self)->list:
+    def getDataLayers(self) -> list:
         """
         Get available data layers.
         Returns:
@@ -305,8 +305,7 @@ class ServerProxy (Server):
         layers = list(map(lambda x: x['id'], rez))
         return layers
 
-
-    def postPackage(self, layer: int, label: str, fields: dict)->int:
+    def postPackage(self, layer: int, label: str, fields: dict) -> int:
         """
         Send package to input node of the project-server.
 
@@ -318,10 +317,10 @@ class ServerProxy (Server):
         Returns:
             int: package ID
         """
-        package=dict(label=label,felds=fields)
+        package = dict(label=label, felds=fields)
         return self.postPackage(layer, package)
 
-    def postPackage(self, layer: int, package: dict)->int:
+    def postPackage(self, layer: int, package: dict) -> int:
         """
         Send package to input node of the project-server.
 
@@ -333,11 +332,11 @@ class ServerProxy (Server):
             int: package ID
         """
         p = self.post(f'/projects/{self.project}/nodes/{self.input_node}/packages',
-                params=dict(data_layer_id=layer,),
-                json=package)
+                      params=dict(data_layer_id=layer, ),
+                      json=package)
         return p['id']
 
-    def searchByMaster(self, layer: int, master: int, page: int=1, page_size: int=1):
+    def searchByMaster(self, layer: int, master: int, page: int = 1, page_size: int = 1):
         """
         Seach package in the output node of the project-server by the master package id.
 
@@ -351,16 +350,17 @@ class ServerProxy (Server):
             dict: result dictionary
         """
         return self.post(f'/projects/{self.project}/nodes/{self.output_node}/packages/search',
-        params=dict(
-            data_layer_id=layer,
-            page=page,
-            page_size=page_size
-            ),
-        json=dict(
-            master_id=master
-            ))
+                         params=dict(
+                             data_layer_id=layer,
+                             page=page,
+                             page_size=page_size
+                         ),
+                         json=dict(
+                             master_id=master
+                         ))
 
-    def waitResult(self, layer: int, master: int, timeout=timedelta(minutes=5), retry_pause:int=5, page: int=1, page_size: int=10)->list:
+    def waitResult(self, layer: int, master: int, timeout=timedelta(minutes=5), retry_pause: int = 5, page: int = 1,
+                   page_size: int = 10) -> list:
         """
 
         Wait for the results packages in the output node of the project-server.
@@ -395,7 +395,7 @@ class ServerProxy (Server):
 
         return results['items'], results['total']
 
-    def waitOneResult(self, layer: int, master: int, timeout=timedelta(minutes=5), retry_pause:int=5)->list:
+    def waitOneResult(self, layer: int, master: int, timeout=timedelta(minutes=5), retry_pause: int = 5) -> list:
         """
 
         Wait for the one result package in the output node of the project-server.
@@ -415,7 +415,7 @@ class ServerProxy (Server):
         items, _ = self.waitResult(layer, master, timeout, retry_pause, 1, 1)
         return items[0]['id'], items[0]['fields']
 
-    def getFilesList(self, ident: int)->list:
+    def getFilesList(self, ident: int) -> list:
         """
         Get files list of package
         Args:
@@ -426,7 +426,7 @@ class ServerProxy (Server):
         """
         return self.get(f'/projects/{self.project}/nodes/{self.output_node}/packages/{ident}/files')
 
-    def waitOneResultAndFiles(self, layer, master, timeout=timedelta(minutes=5), retry_pause:int=5)->list:
+    def waitOneResultAndFiles(self, layer, master, timeout=timedelta(minutes=5), retry_pause: int = 5) -> list:
         """
         Wait for the one result package in the output node of the project-server.
 

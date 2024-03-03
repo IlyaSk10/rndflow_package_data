@@ -6,7 +6,7 @@ class DataLayer():
 
     def list_layers(self, project_id=None):
         self.project_id = project_id or self.project_id
-        print(f"Listing data layers for #{self.project_id} project ...", end="")
+        print(f"Listing data layers for #{self.project_id} project ...\n", end="")
         self.all = self.server.get(endpoint=f"/projects/{self.project_id}/data_layers")
         return self.all
 
